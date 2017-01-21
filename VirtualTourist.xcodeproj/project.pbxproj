@@ -8,22 +8,28 @@
 
 /* Begin PBXBuildFile section */
 		FCAFEEE91E3154A400716E18 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCAFEEE81E3154A400716E18 /* AppDelegate.swift */; };
-		FCAFEEEB1E3154A400716E18 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCAFEEEA1E3154A400716E18 /* ViewController.swift */; };
 		FCAFEEEE1E3154A400716E18 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FCAFEEEC1E3154A400716E18 /* Main.storyboard */; };
-		FCAFEEF11E3154A400716E18 /* VirtualTourist.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FCAFEEEF1E3154A400716E18 /* VirtualTourist.xcdatamodeld */; };
 		FCAFEEF31E3154A400716E18 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FCAFEEF21E3154A400716E18 /* Assets.xcassets */; };
 		FCAFEEF61E3154A400716E18 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FCAFEEF41E3154A400716E18 /* LaunchScreen.storyboard */; };
+		FCC0820E1E31657F00436824 /* MapVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCC0820D1E31657F00436824 /* MapVC.swift */; };
+		FCC082111E316F0F00436824 /* CoreDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCC082101E316F0F00436824 /* CoreDataHelper.swift */; };
+		FCC082131E31723300436824 /* VCExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCC082121E31723300436824 /* VCExtras.swift */; };
+		FCC082181E319C5100436824 /* VirtualTourist.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FCC082161E319C5100436824 /* VirtualTourist.xcdatamodeld */; };
+		FCF8245A1E32972500044300 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCF824591E32972500044300 /* Constants.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		FCAFEEE51E3154A400716E18 /* VirtualTourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VirtualTourist.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FCAFEEE81E3154A400716E18 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		FCAFEEEA1E3154A400716E18 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		FCAFEEED1E3154A400716E18 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		FCAFEEF01E3154A400716E18 /* VirtualTourist.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = VirtualTourist.xcdatamodel; sourceTree = "<group>"; };
 		FCAFEEF21E3154A400716E18 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FCAFEEF51E3154A400716E18 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		FCAFEEF71E3154A400716E18 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FCC0820D1E31657F00436824 /* MapVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapVC.swift; sourceTree = "<group>"; };
+		FCC082101E316F0F00436824 /* CoreDataHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataHelper.swift; sourceTree = "<group>"; };
+		FCC082121E31723300436824 /* VCExtras.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VCExtras.swift; sourceTree = "<group>"; };
+		FCC082171E319C5100436824 /* VirtualTourist.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = VirtualTourist.xcdatamodel; sourceTree = "<group>"; };
+		FCF824591E32972500044300 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,15 +62,58 @@
 		FCAFEEE71E3154A400716E18 /* VirtualTourist */ = {
 			isa = PBXGroup;
 			children = (
-				FCAFEEE81E3154A400716E18 /* AppDelegate.swift */,
-				FCAFEEEA1E3154A400716E18 /* ViewController.swift */,
-				FCAFEEEC1E3154A400716E18 /* Main.storyboard */,
-				FCAFEEF21E3154A400716E18 /* Assets.xcassets */,
-				FCAFEEF41E3154A400716E18 /* LaunchScreen.storyboard */,
-				FCAFEEF71E3154A400716E18 /* Info.plist */,
-				FCAFEEEF1E3154A400716E18 /* VirtualTourist.xcdatamodeld */,
+				FCC0820F1E316EE000436824 /* CoreData */,
+				FCAFEEFF1E31572500716E18 /* Model */,
+				FCAFEEFE1E31572100716E18 /* View */,
+				FCAFEEFD1E31571B00716E18 /* Controller */,
+				FCAFEF001E31572E00716E18 /* Assets */,
 			);
 			path = VirtualTourist;
+			sourceTree = "<group>";
+		};
+		FCAFEEFD1E31571B00716E18 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				FCC0820D1E31657F00436824 /* MapVC.swift */,
+				FCC082121E31723300436824 /* VCExtras.swift */,
+			);
+			name = Controller;
+			sourceTree = "<group>";
+		};
+		FCAFEEFE1E31572100716E18 /* View */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = View;
+			sourceTree = "<group>";
+		};
+		FCAFEEFF1E31572500716E18 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				FCF824591E32972500044300 /* Constants.swift */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		FCAFEF001E31572E00716E18 /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				FCAFEEF71E3154A400716E18 /* Info.plist */,
+				FCAFEEF41E3154A400716E18 /* LaunchScreen.storyboard */,
+				FCAFEEF21E3154A400716E18 /* Assets.xcassets */,
+				FCAFEEEC1E3154A400716E18 /* Main.storyboard */,
+				FCAFEEE81E3154A400716E18 /* AppDelegate.swift */,
+			);
+			name = Assets;
+			sourceTree = "<group>";
+		};
+		FCC0820F1E316EE000436824 /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				FCC082101E316F0F00436824 /* CoreDataHelper.swift */,
+				FCC082161E319C5100436824 /* VirtualTourist.xcdatamodeld */,
+			);
+			name = CoreData;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -140,9 +189,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FCAFEEEB1E3154A400716E18 /* ViewController.swift in Sources */,
 				FCAFEEE91E3154A400716E18 /* AppDelegate.swift in Sources */,
-				FCAFEEF11E3154A400716E18 /* VirtualTourist.xcdatamodeld in Sources */,
+				FCC0820E1E31657F00436824 /* MapVC.swift in Sources */,
+				FCC082181E319C5100436824 /* VirtualTourist.xcdatamodeld in Sources */,
+				FCC082111E316F0F00436824 /* CoreDataHelper.swift in Sources */,
+				FCC082131E31723300436824 /* VCExtras.swift in Sources */,
+				FCF8245A1E32972500044300 /* Constants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -306,16 +358,17 @@
 				FCAFEEFC1E3154A400716E18 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		FCAFEEEF1E3154A400716E18 /* VirtualTourist.xcdatamodeld */ = {
+		FCC082161E319C5100436824 /* VirtualTourist.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				FCAFEEF01E3154A400716E18 /* VirtualTourist.xcdatamodel */,
+				FCC082171E319C5100436824 /* VirtualTourist.xcdatamodel */,
 			);
-			currentVersion = FCAFEEF01E3154A400716E18 /* VirtualTourist.xcdatamodel */;
+			currentVersion = FCC082171E319C5100436824 /* VirtualTourist.xcdatamodel */;
 			path = VirtualTourist.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

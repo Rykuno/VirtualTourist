@@ -1,14 +1,18 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11134" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16B2555" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11106"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--MapVC-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="MapVC" customModule="VirtualTourist" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
@@ -16,11 +20,49 @@
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <navigationBar contentMode="scaleToFill" translucent="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZAy-9A-XUK">
+                                <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="Ifq-qa-48s"/>
+                                </constraints>
+                                <items>
+                                    <navigationItem title="Virtual Tourist" id="bnc-FH-Uki">
+                                        <barButtonItem key="leftBarButtonItem" title="Test" id="1cE-WD-uhI">
+                                            <connections>
+                                                <action selector="testAction:" destination="BYZ-38-t0r" id="dIZ-L8-lAo"/>
+                                            </connections>
+                                        </barButtonItem>
+                                        <barButtonItem key="rightBarButtonItem" systemItem="edit" id="GnQ-cA-5p7">
+                                            <connections>
+                                                <action selector="editAction:" destination="BYZ-38-t0r" id="wj9-DY-b0k"/>
+                                            </connections>
+                                        </barButtonItem>
+                                    </navigationItem>
+                                </items>
+                            </navigationBar>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="mS5-3n-7Bu">
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
+                            </mapView>
+                        </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="mS5-3n-7Bu" firstAttribute="top" secondItem="ZAy-9A-XUK" secondAttribute="bottom" id="DcC-G5-3kA"/>
+                            <constraint firstAttribute="trailing" secondItem="ZAy-9A-XUK" secondAttribute="trailing" id="LVc-sz-5Qd"/>
+                            <constraint firstAttribute="trailing" secondItem="mS5-3n-7Bu" secondAttribute="trailing" id="ZVr-4b-mLr"/>
+                            <constraint firstItem="ZAy-9A-XUK" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="dtR-Pl-pkA"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="mS5-3n-7Bu" secondAttribute="bottom" id="vdQ-dy-pcl"/>
+                            <constraint firstItem="ZAy-9A-XUK" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="w1X-Hh-WaY"/>
+                            <constraint firstItem="mS5-3n-7Bu" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="wfL-Yz-VYe"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="mapView" destination="mS5-3n-7Bu" id="wm5-BF-9eo"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="117.59999999999999" y="122.78860569715144"/>
         </scene>
     </scenes>
 </document>
