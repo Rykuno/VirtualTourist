@@ -12,12 +12,23 @@ import MapKit
 
 class CoreDataHelper {
     
-    class var shared: CoreDataHelper {
-        struct Static {
-            static let instance = CoreDataHelper()
+    private var pinArray = [Pin]()
+    private var savedPins = [Pin]()
+    
+    private var initialFetch = false
+    public var getPinArrayCount: Int {
+        get{
+            return pinArray.count
         }
-        return Static.instance
     }
+    
+    class func sharedInstance() -> CoreDataHelper {
+        struct Singleton{
+            static var sharedInstance = CoreDataHelper()
+        }
+        return Singleton.sharedInstance
+    }
+    
     
     //MARK: - Core Data
     func createPin(latitude: CLLocationDegrees, longitude: CLLocationDegrees, completionHandler: (_ error: String?) -> Void){
@@ -25,6 +36,7 @@ class CoreDataHelper {
         let pin = Pin(context: moc)
         pin.latitude = latitude
         pin.longitude = longitude
+        pinArray.append(pin)
         
         do{
             try moc.save()
@@ -37,9 +49,12 @@ class CoreDataHelper {
     func fetchPins(completionHandler: (_ annotationArray: [MKAnnotation]?, _ error:String?) -> Void) {
         let moc = persistentContainer.viewContext
         let request: NSFetchRequest<Pin> = Pin.fetchRequest()
-        
         do{
             let results = try moc.fetch(request)
+            if !initialFetch {
+            pinArray.append(contentsOf: results)
+            initialFetch = true
+            }
             var annotationArr = [MKAnnotation]()
             for result in results {
                 let annotation = MKPointAnnotation()
@@ -47,13 +62,78 @@ class CoreDataHelper {
                 annotation.coordinate.longitude = result.longitude
                 annotationArr.append(annotation)
             }
-            
+            print(pinArray.count)
             completionHandler(annotationArr, nil)
         }catch{
             completionHandler(nil, "Error fetching pins")
         }
+    } 
+    
+    func deletePin(latitude: CLLocationDegrees, longitude: CLLocationDegrees, completionHandler: (_ error: String?)-> Void){
+        var pinToDelete: Pin?
+        for pin in pinArray {
+            if (pin.latitude == latitude && pin.longitude == longitude){
+                pinToDelete = pin
+                pinArray.remove(at: pinArray.index(of: pin)!)
+            }
+        }
+        
+        if let pinToDelete = pinToDelete{
+                let moc = persistentContainer.viewContext
+                do{
+                    try moc.delete(pinToDelete)
+                    try moc.save()
+                    completionHandler(nil)
+                }catch{
+                    completionHandler("Failed to remove pin")
+                }
+        }
     }
     
+    func addPhotosToPin(latitude: CLLocationDegrees, longitude: CLLocationDegrees, photoItem: UIImage, completionHandler: (_ error: String?)-> Void) {
+        var pinToLocate : Pin?
+        let moc = persistentContainer.viewContext
+        //Find current pin
+        for pin in pinArray {
+            if (pin.latitude == latitude && pin.longitude == longitude){
+                pinToLocate = pin
+            }
+        }
+        
+        let photo = Photo(context: moc)
+        photo.image = UIImageJPEGRepresentation(photoItem, 1.0) as NSData?
+        pinToLocate?.addToPhoto(photo) 
+        print("yay")
+        
+        do{
+            try saveContext()
+            savedPins.append(pinToLocate!)
+            completionHandler(nil)
+        }
+    }
+    
+    func pinHasPhotos(latitude: Double, longitude: Double) -> Bool {
+        let moc = persistentContainer.viewContext
+        let request: NSFetchRequest<Pin> = Pin.fetchRequest()
+        
+        do{
+            let results = try moc.fetch(request)
+            for result in results {
+                if (result.latitude == latitude && result.longitude == longitude) {
+                     print("found")
+                    if (result.photo?.count)! > 0 {
+                        print("has photos")
+                        return true
+                    }else{
+                        return false
+                    }
+                }
+            }
+        }catch{
+            
+        }
+        return false
+    }
     
     // MARK: - Core Data stack
     lazy var persistentContainer: NSPersistentContainer = {
