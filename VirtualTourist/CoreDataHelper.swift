@@ -13,7 +13,7 @@ import MapKit
 class CoreDataHelper {
     
     private var pinArray = [Pin]()
-    private var savedPins = [Pin]()
+     var image: UIImage?
     
     private var initialFetch = false
     public var getPinArrayCount: Int {
@@ -62,12 +62,35 @@ class CoreDataHelper {
                 annotation.coordinate.longitude = result.longitude
                 annotationArr.append(annotation)
             }
-            print(pinArray.count)
             completionHandler(annotationArr, nil)
         }catch{
             completionHandler(nil, "Error fetching pins")
         }
-    } 
+    }
+    
+    
+    func fetchPhotosForPin(latitude: CLLocationDegrees, longitude: CLLocationDegrees, callback: (_ image: UIImage) -> Void){
+        let moc = persistentContainer.viewContext
+        let request: NSFetchRequest<Pin> = Pin.fetchRequest()
+        
+        do{
+            let results = try moc.fetch(request)
+            for result in results {
+                if (result.latitude == latitude && result.longitude == longitude){
+                    let pin = result
+                    let photos = pin.photo as! Set<Photo>
+                    for photo in photos {
+                        print(UIImage(data: photo.image as! Data)!)
+                        image = (UIImage(data: photo.image as! Data)!)
+                        callback(image!)
+                    }
+                }
+            }
+        }catch{
+            
+        }
+    }
+    
     
     func deletePin(latitude: CLLocationDegrees, longitude: CLLocationDegrees, completionHandler: (_ error: String?)-> Void){
         var pinToDelete: Pin?
@@ -107,7 +130,6 @@ class CoreDataHelper {
         
         do{
             try saveContext()
-            savedPins.append(pinToLocate!)
             completionHandler(nil)
         }
     }

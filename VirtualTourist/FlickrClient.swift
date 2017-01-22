@@ -29,7 +29,6 @@ class FlickrClient: NSObject {
         let session = URLSession(configuration: sessionConfig, delegate: nil, delegateQueue: nil)
         
         // Create the Request:
-
         guard var URL = URL(string: "https://api.flickr.com/services/rest/") else {return}
         let URLParams = [
             "method": "flickr.photos.search",

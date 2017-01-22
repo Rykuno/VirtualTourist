@@ -9,13 +9,13 @@
 import Foundation
 import UIKit
 
-class PhotoDownloader: NSObject {
+class PhotoDownloadClient: NSObject {
     
     private override init() {}
     
-    class func sharedInstance() -> PhotoDownloader {
+    class func sharedInstance() -> PhotoDownloadClient {
         struct Singleton{
-            static var sharedInstance = PhotoDownloader()
+            static var sharedInstance = PhotoDownloadClient()
         }
         return Singleton.sharedInstance
     }
