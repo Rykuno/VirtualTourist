@@ -10,67 +10,95 @@ import UIKit
 import MapKit
 import CoreData
 
-class PinDetailVC: UIViewController, MKMapViewDelegate, UICollectionViewDataSource, UICollectionViewDelegate {
+class PinDetailVC: UIViewController, MKMapViewDelegate {
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var collectionView: UICollectionView!
     
-    var imageArray = [UIImage]()
+    var urlArray = [String]()
+    var imageDictionary = [String:Data]()
     var annotation: MKAnnotation!
-    
+    var latitude: Double!
+    var longitude: Double!
+ 
     override func viewDidLoad() {
         super.viewDidLoad()
         mapView.delegate = self
         collectionView.dataSource = self
         collectionView.delegate = self
-        // Do any additional setup after loading the view.
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(true)
+        CoreDataHelper.sharedInstance().savePhotoToPin(latitude: latitude, longitude: longitude, images: imageDictionary) { (success, error) in
+            if success {
+                print("Updated")
+            }
+        }
+    }
+     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         mapView.addAnnotation(annotation)
         let span = MKCoordinateSpanMake(0.05, 0.05)
         let region = MKCoordinateRegionMake(annotation.coordinate, span)
         self.mapView.setRegion(region, animated: false)
-        requestPhotos()
-        CoreDataHelper.sharedInstance().fetchPhotosForPin(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude) { (image) in
-                imageArray.append(image)
-            print("appended image")
-            collectionView.reloadData()
-        }
-        
+        retrieveImageUrls(latitude: latitude, longitude: longitude)
     }
-    
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return imageArray.count
-        
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "imageCell", for: indexPath) as! ImageCell
-        cell.image.image = imageArray[indexPath.row]
-        return cell
-    }
-    
+ 
 
-    func requestPhotos(){
-        let hasPhotosSaved = CoreDataHelper.sharedInstance().pinHasPhotos(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude)
+    func retrieveImageUrls(latitude: Double, longitude: Double){
+        FlickrClient.sharedInstance().sendRequest(latitude: latitude, longitude: longitude) { (urlArray, error) in
+            guard error == nil else{
+                self.displayError(title: "Download Error", message: error!)
+                return
+            }
+            
+            guard urlArray.count != 0 else {
+                self.displayError(title: "Download Error", message: "No Images to Be Shown")
+                return
+            }
+            
+            CoreDataHelper.sharedInstance().createImageUrls(urlArray: urlArray, latitude: latitude, longitude: longitude, completionHandler: { (success, error) in
+                if success {
+                    DispatchQueue.main.async {
+                    self.urlArray = urlArray
+                    self.collectionView.reloadData()
+                    }
+                }
+            })
+            
+        }
+    }
+    
+    func configureCell(_ cell: UICollectionViewCell, for indexPath: IndexPath){
+        guard let cell = cell as? ImageCell else {return}
+        cell.activityIndicator.startAnimating()
+        cell.backgroundColor = UIColor.gray
         
-        if !hasPhotosSaved{
-            FlickrClient.sharedInstance().sendRequest(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude) { (UrlArray, error) in
-                guard error == nil else{
-                    return
-                }
-                
-                for url in UrlArray {
-                    PhotoDownloadClient.sharedInstance().downloadImage(url: url, completionHandler: { (imageData) in
-                        DispatchQueue.main.async {
-                            CoreDataHelper.sharedInstance().addPhotosToPin(latitude: self.annotation.coordinate.latitude, longitude: self.annotation.coordinate.longitude, photoItem: imageData!, completionHandler: { (error) in
-                            })
-                        }
-                    })
-                }
+        
+        //If Images DO NOT exist yet
+        let url = URL(string: urlArray[indexPath.row])
+        DispatchQueue.global().async {
+            let data = try? Data(contentsOf: url!) //make sure your image in this url does exist, otherwise unwrap in a if let check / try-catch
+            self.imageDictionary.updateValue(data!, forKey: self.urlArray[indexPath.row])
+            DispatchQueue.main.async {
+                cell.image.image = UIImage(data: data!)
             }
         }
     }
+}
+
+extension PinDetailVC: UICollectionViewDataSource, UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return urlArray.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! ImageCell
+        configureCell(cell, for: indexPath)
+        return cell
+    }
+    
+    
+    
 }

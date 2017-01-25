@@ -20,7 +20,6 @@ class PhotoDownloadClient: NSObject {
         return Singleton.sharedInstance
     }
     
-    
     func downloadImage(url: String, completionHandler: @escaping (_ image:UIImage?) -> Void) {
         let session = URLSession.shared
         let task = session.dataTask(with: URL(string:url)!) { (data, response, error) in
@@ -32,3 +31,4 @@ class PhotoDownloadClient: NSObject {
         task.resume()
     }
 }
+ 

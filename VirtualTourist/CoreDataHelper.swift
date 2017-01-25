@@ -13,14 +13,14 @@ import MapKit
 class CoreDataHelper {
     
     private var pinArray = [Pin]()
-     var image: UIImage?
-    
-    private var initialFetch = false
     public var getPinArrayCount: Int {
-        get{
+        get{ 
             return pinArray.count
         }
     }
+    
+    private var initialFetch = false
+    
     
     class func sharedInstance() -> CoreDataHelper {
         struct Singleton{
@@ -31,15 +31,15 @@ class CoreDataHelper {
     
     
     //MARK: - Core Data
-    func createPin(latitude: CLLocationDegrees, longitude: CLLocationDegrees, completionHandler: (_ error: String?) -> Void){
+    func createPin(latitude: Double, longitude: Double, completionHandler: (_ error: String?) -> Void){
         let moc = persistentContainer.viewContext
         let pin = Pin(context: moc)
         pin.latitude = latitude
         pin.longitude = longitude
         pinArray.append(pin)
-        
         do{
             try moc.save()
+            print("created Pin")
             completionHandler(nil)
         }catch{
             completionHandler("Error Saving Data")
@@ -52,8 +52,8 @@ class CoreDataHelper {
         do{
             let results = try moc.fetch(request)
             if !initialFetch {
-            pinArray.append(contentsOf: results)
-            initialFetch = true
+                pinArray.append(contentsOf: results)
+                initialFetch = true
             }
             var annotationArr = [MKAnnotation]()
             for result in results {
@@ -68,94 +68,108 @@ class CoreDataHelper {
         }
     }
     
-    
-    func fetchPhotosForPin(latitude: CLLocationDegrees, longitude: CLLocationDegrees, callback: (_ image: UIImage) -> Void){
-        let moc = persistentContainer.viewContext
-        let request: NSFetchRequest<Pin> = Pin.fetchRequest()
-        
-        do{
-            let results = try moc.fetch(request)
-            for result in results {
-                if (result.latitude == latitude && result.longitude == longitude){
-                    let pin = result
-                    let photos = pin.photo as! Set<Photo>
-                    for photo in photos {
-                        print(UIImage(data: photo.image as! Data)!)
-                        image = (UIImage(data: photo.image as! Data)!)
-                        callback(image!)
-                    }
-                }
-            }
-        }catch{
-            
-        }
-    }
-    
-    
     func deletePin(latitude: CLLocationDegrees, longitude: CLLocationDegrees, completionHandler: (_ error: String?)-> Void){
-        var pinToDelete: Pin?
-        for pin in pinArray {
-            if (pin.latitude == latitude && pin.longitude == longitude){
-                pinToDelete = pin
-                pinArray.remove(at: pinArray.index(of: pin)!)
-            }
-        }
-        
-        if let pinToDelete = pinToDelete{
-                let moc = persistentContainer.viewContext
-                do{
-                    try moc.delete(pinToDelete)
+        let pin = findPin(latitude: latitude, longitude: longitude)
+        let moc = persistentContainer.viewContext
+            do{
+                if let pin = pin{
+                    try moc.delete(pin)
                     try moc.save()
                     completionHandler(nil)
-                }catch{
-                    completionHandler("Failed to remove pin")
+                }else{
+                    completionHandler("Failed to remove Pin")
                 }
-        }
-    }
+            }catch{
+                completionHandler("Failed to save removed pin")
+            }
+     }
     
-    func addPhotosToPin(latitude: CLLocationDegrees, longitude: CLLocationDegrees, photoItem: UIImage, completionHandler: (_ error: String?)-> Void) {
-        var pinToLocate : Pin?
+    func createImageUrls(urlArray: [String], latitude: Double, longitude: Double, completionHandler: (_ success: Bool, _ error: String?) -> Void) {
+        let pin = findPin(latitude: latitude, longitude: longitude)
         let moc = persistentContainer.viewContext
-        //Find current pin
-        for pin in pinArray {
-            if (pin.latitude == latitude && pin.longitude == longitude){
-                pinToLocate = pin
+        do{
+            if let pin = pin {
+                for url in urlArray {
+                    let photo = Photo(context: moc)
+                    photo.url = url
+                    pin.addToPhoto(photo)
+                    print("added photo")
+                }
+                saveContext()
+                completionHandler(true, nil)
+
+            }else{
+                completionHandler(false, "Error Creating Image Urls")
             }
         }
-        
-        let photo = Photo(context: moc)
-        photo.image = UIImageJPEGRepresentation(photoItem, 1.0) as NSData?
-        pinToLocate?.addToPhoto(photo) 
-        print("yay")
+    }
+    
+    
+    func fetchImageUrls(latitude: Double, longitude: Double, completionHandler: (_ urlArray: [String]?, _ error: String?) -> Void) {
+        //Find pin with matching lat and long
+        let pin = findPin(latitude: latitude, longitude: longitude)
+        var urlArray = [String]()
         
         do{
-            try saveContext()
-            completionHandler(nil)
+            if let pin = pin {
+                let photos = (pin.photo?.allObjects) as! [Photo]
+                for photo in photos {
+                    urlArray.append(photo.url!)
+                }
+                completionHandler(urlArray, nil)
+            }else{
+                completionHandler(nil, "Could Not Find URLs")
+            }
         }
     }
     
-    func pinHasPhotos(latitude: Double, longitude: Double) -> Bool {
+    
+    
+    
+    func savePhotoToPin(latitude: Double, longitude: Double, images: [String:Data], completionHandler: (_ success: Bool, _ error: String?) -> Void) {
         let moc = persistentContainer.viewContext
-        let request: NSFetchRequest<Pin> = Pin.fetchRequest()
+        let request: NSFetchRequest<Photo> = Photo.fetchRequest()
         
         do{
             let results = try moc.fetch(request)
             for result in results {
-                if (result.latitude == latitude && result.longitude == longitude) {
-                     print("found")
-                    if (result.photo?.count)! > 0 {
-                        print("has photos")
-                        return true
-                    }else{
-                        return false
-                    }
+                if let resultURL = result.url{
+                    let value = images[resultURL]
+                    result.image = value as NSData?
                 }
+            }
+            saveContext()
+            completionHandler(true, nil)
+        }catch{
+            completionHandler(false, "Error creating image urls")
+        }
+    }
+    
+    
+    func findPin(latitude: Double, longitude: Double) -> Pin?{
+        let moc = persistentContainer.viewContext
+        let request: NSFetchRequest<Pin> = Pin.fetchRequest()
+        
+        let sortDescriptor = NSSortDescriptor(key: "latitude", ascending: true)
+        let requestPredicateLat = NSPredicate(format: "latitude == %lf", latitude)
+        let requestPredicateLon = NSPredicate(format: "longitude == %lf", longitude)
+        let compoundPredicate = NSCompoundPredicate(type: .and, subpredicates: [requestPredicateLat,requestPredicateLon])
+        request.sortDescriptors = [sortDescriptor]
+        request.predicate = compoundPredicate
+        
+        do{
+            let results = try moc.fetch(request)
+            if results.count > 0 {
+                return results[0]
+            }else{
+                return nil
             }
         }catch{
             
         }
-        return false
+        return nil
     }
+    
     
     // MARK: - Core Data stack
     lazy var persistentContainer: NSPersistentContainer = {
@@ -200,6 +214,5 @@ class CoreDataHelper {
             }
         }
     }
-    
-    
+
 }

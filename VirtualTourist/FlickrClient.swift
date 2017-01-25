@@ -35,7 +35,7 @@ class FlickrClient: NSObject {
             "api_key": "040e5c9f08eb49f7ff3ffc7b417af8e9",
             "safe_search": "1",
             "extras": "url_s",
-            "per_page": "21",
+            "per_page": "20",
             "format": "json",
             "nojsoncallback": "1",
             "lat": "\(latitude)",
@@ -113,7 +113,7 @@ class FlickrClient: NSObject {
         session.finishTasksAndInvalidate()
     }
 }
-
+ 
 private func parseImages(dictionary: [String:AnyObject]) -> String{
     
     guard let url = dictionary["url_s"] else{
