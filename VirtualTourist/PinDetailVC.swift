@@ -108,7 +108,9 @@ class PinDetailVC: UIViewController, MKMapViewDelegate {
             let url = URL(string: urlArray[indexPath.row])
             DispatchQueue.global().async {
                 let data = try? Data(contentsOf: url!) //make sure your image in this url does exist, otherwise unwrap in a if let check / try-catch
-                self.imageDictionary.updateValue(UIImageJPEGRepresentation(UIImage(data: data!)!, 0.3)!, forKey: self.urlArray[indexPath.row])
+                
+                //USED TO BE JPGTODATA : WORKING
+                self.imageDictionary.updateValue(data!, forKey: self.urlArray[indexPath.row])
                 DispatchQueue.main.async {
                     cell.image.image = UIImage(data: data!)
                 }
@@ -136,11 +138,9 @@ extension PinDetailVC: UICollectionViewDelegate, UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        print("did select")
     }
     
-    func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
-        //
-    }
     
 }
 
