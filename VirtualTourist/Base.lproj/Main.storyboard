@@ -35,7 +35,7 @@
                                 <rect key="frame" x="0.0" y="597" width="375" height="70"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tap Pins to Delete" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="B0e-QF-ksw">
-                                        <rect key="frame" x="112.5" y="22.5" width="150" height="25"/>
+                                        <rect key="frame" x="113" y="23" width="150" height="25"/>
                                         <fontDescription key="fontDescription" name="AvenirNext-DemiBold" family="Avenir Next" pointSize="18"/>
                                         <color key="textColor" red="0.86181089775252118" green="0.93983978426395942" blue="0.87200996502752282" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <color key="highlightedColor" red="0.97512983563160838" green="1" blue="0.98867796272652353" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -129,7 +129,7 @@
                                                             <rect key="frame" x="8" y="8" width="84" height="84"/>
                                                             <color key="color" red="0.21463476545609611" green="0.20390931761766976" blue="0.21676713197969544" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                         </activityIndicatorView>
-                                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gGu-jL-Top">
+                                                        <imageView multipleTouchEnabled="YES" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gGu-jL-Top">
                                                             <rect key="frame" x="0.0" y="0.0" width="100" height="100"/>
                                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         </imageView>
@@ -156,6 +156,9 @@
                                     <constraint firstAttribute="height" constant="47" id="3V4-Bi-pT4"/>
                                 </constraints>
                                 <state key="normal" title="Button"/>
+                                <connections>
+                                    <action selector="modifyPhotos:" destination="IbI-Kd-PGn" eventType="touchUpInside" id="ww2-V5-3Ns"/>
+                                </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -175,6 +178,7 @@
                     <connections>
                         <outlet property="collectionView" destination="7k5-iy-PRK" id="0zM-8d-Dom"/>
                         <outlet property="mapView" destination="gLv-3X-kWl" id="WE0-Xm-yFB"/>
+                        <outlet property="modificationButton" destination="TUE-lf-3ok" id="CZw-u4-M8e"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Lty-Nv-O9u" userLabel="First Responder" sceneMemberID="firstResponder"/>

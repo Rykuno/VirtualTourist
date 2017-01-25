@@ -39,7 +39,6 @@ class CoreDataHelper {
         pinArray.append(pin)
         do{
             try moc.save()
-            print("created Pin")
             completionHandler(nil)
         }catch{
             completionHandler("Error Saving Data")
@@ -93,7 +92,6 @@ class CoreDataHelper {
                     let photo = Photo(context: moc)
                     photo.url = url
                     pin.addToPhoto(photo)
-                    print("added photo")
                 }
                 saveContext()
                 completionHandler(true, nil)
@@ -123,25 +121,44 @@ class CoreDataHelper {
         }
     }
     
-    
-    
-    
     func savePhotoToPin(latitude: Double, longitude: Double, images: [String:Data], completionHandler: (_ success: Bool, _ error: String?) -> Void) {
-        let moc = persistentContainer.viewContext
-        let request: NSFetchRequest<Photo> = Photo.fetchRequest()
+        let pin = findPin(latitude: latitude, longitude: longitude)
         
+        let photos = pin?.photo?.allObjects as! [Photo]
+        for photo in photos{
+            if let resultURL = photo.url{
+                let value = images[resultURL]
+                photo.image = value as NSData?
+            }
+        }
         do{
-            let results = try moc.fetch(request)
-            for result in results {
-                if let resultURL = result.url{
-                    let value = images[resultURL]
-                    result.image = value as NSData?
+            saveContext()
+        }
+    }
+    
+    func pinHasPhotos(latitude: Double, longitude: Double, completionHandler: (_ success: Bool, _ hasPhotos: Bool)->Void){
+        let pin = findPin(latitude: latitude, longitude: longitude)
+        let photos = pin?.photo?.allObjects as! [Photo]
+        if photos.count > 0 {
+            completionHandler(true, true)
+        }else{
+            completionHandler(true,false)
+        }
+    }
+    
+    func fetchPhotos(latitude: Double, longitude: Double, completionHandler: (_ success: Bool, _ imageDictionary: [String:Data]?) -> Void){
+        let pin = findPin(latitude: latitude, longitude: longitude)
+        var dictionary = [String:Data]()
+        if let pin = pin {
+            let photos = pin.photo?.allObjects as! [Photo]
+            for photo in photos{
+                if let image = photo.image, let url = photo.url{
+                    dictionary.updateValue(image as Data, forKey: url)
                 }
             }
-            saveContext()
-            completionHandler(true, nil)
-        }catch{
-            completionHandler(false, "Error creating image urls")
+            completionHandler(true, dictionary)
+        }else{
+            completionHandler(false, nil)
         }
     }
     
