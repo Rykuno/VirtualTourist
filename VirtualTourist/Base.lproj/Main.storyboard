@@ -81,10 +81,10 @@
             </objects>
             <point key="canvasLocation" x="1056.8" y="122.78860569715144"/>
         </scene>
-        <!--Pin DetailVC-->
+        <!--Photo AlbumVC-->
         <scene sceneID="yRa-rS-7cE">
             <objects>
-                <viewController storyboardIdentifier="PinDetailVC" id="IbI-Kd-PGn" customClass="PinDetailVC" customModule="VirtualTourist" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="PhotoAlbumVC" id="IbI-Kd-PGn" customClass="PhotoAlbumVC" customModule="VirtualTourist" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="atX-fT-3Sg"/>
                         <viewControllerLayoutGuide type="bottom" id="579-Vr-vOb"/>
@@ -100,7 +100,7 @@
                                 </items>
                             </navigationBar>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="Wit-xY-DCd">
-                                <rect key="frame" x="0.0" y="44" width="375" height="576"/>
+                                <rect key="frame" x="0.0" y="44" width="375" height="578"/>
                                 <subviews>
                                     <mapView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" mapType="standard" zoomEnabled="NO" scrollEnabled="NO" rotateEnabled="NO" pitchEnabled="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gLv-3X-kWl">
                                         <rect key="frame" x="0.0" y="0.0" width="375" height="214"/>
@@ -109,7 +109,7 @@
                                         </constraints>
                                     </mapView>
                                     <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="7k5-iy-PRK">
-                                        <rect key="frame" x="0.0" y="214" width="375" height="362"/>
+                                        <rect key="frame" x="0.0" y="214" width="375" height="364"/>
                                         <color key="backgroundColor" red="0.86177427030456855" green="0.86177427030456855" blue="0.86177427030456855" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="3" minimumInteritemSpacing="3" id="e97-1u-J94">
                                             <size key="itemSize" width="100" height="100"/>
@@ -150,14 +150,14 @@
                                     </collectionView>
                                 </subviews>
                             </stackView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TUE-lf-3ok">
-                                <rect key="frame" x="0.0" y="620" width="375" height="47"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="CyU-HJ-Oku">
+                                <rect key="frame" x="0.0" y="622" width="375" height="45"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="47" id="3V4-Bi-pT4"/>
+                                    <constraint firstAttribute="height" constant="45" id="tiD-NJ-aXp"/>
                                 </constraints>
-                                <state key="normal" title="Button"/>
+                                <state key="normal" title="New Collection"/>
                                 <connections>
-                                    <action selector="modifyPhotos:" destination="IbI-Kd-PGn" eventType="touchUpInside" id="ww2-V5-3Ns"/>
+                                    <action selector="modifyPhotosButton:" destination="IbI-Kd-PGn" eventType="touchUpInside" id="Bb3-Ov-qJc"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -166,19 +166,19 @@
                             <constraint firstItem="H7m-c1-ZfX" firstAttribute="top" secondItem="8PX-8q-TSn" secondAttribute="top" id="EeQ-6H-MRX"/>
                             <constraint firstAttribute="trailing" secondItem="Wit-xY-DCd" secondAttribute="trailing" id="Gyx-h5-MFc"/>
                             <constraint firstItem="H7m-c1-ZfX" firstAttribute="trailing" secondItem="Wit-xY-DCd" secondAttribute="trailing" id="IrC-Uk-ydR"/>
+                            <constraint firstAttribute="trailing" secondItem="CyU-HJ-Oku" secondAttribute="trailing" id="Iwg-wU-GeU"/>
                             <constraint firstItem="H7m-c1-ZfX" firstAttribute="leading" secondItem="Wit-xY-DCd" secondAttribute="leading" id="NvU-Ax-1io"/>
-                            <constraint firstItem="TUE-lf-3ok" firstAttribute="top" secondItem="Wit-xY-DCd" secondAttribute="bottom" id="bH9-pP-xae"/>
-                            <constraint firstItem="H7m-c1-ZfX" firstAttribute="leading" secondItem="TUE-lf-3ok" secondAttribute="leading" id="hAD-bH-bmc"/>
+                            <constraint firstItem="CyU-HJ-Oku" firstAttribute="leading" secondItem="8PX-8q-TSn" secondAttribute="leading" id="cLs-Lk-SqH"/>
+                            <constraint firstItem="579-Vr-vOb" firstAttribute="top" secondItem="CyU-HJ-Oku" secondAttribute="bottom" id="dEy-8M-gqD"/>
+                            <constraint firstItem="CyU-HJ-Oku" firstAttribute="top" secondItem="Wit-xY-DCd" secondAttribute="bottom" id="iE0-6a-5HH"/>
                             <constraint firstItem="Wit-xY-DCd" firstAttribute="leading" secondItem="8PX-8q-TSn" secondAttribute="leading" id="kOw-51-ywM"/>
-                            <constraint firstItem="H7m-c1-ZfX" firstAttribute="trailing" secondItem="TUE-lf-3ok" secondAttribute="trailing" id="ldy-Xi-jE5"/>
                             <constraint firstItem="Wit-xY-DCd" firstAttribute="top" secondItem="H7m-c1-ZfX" secondAttribute="bottom" id="tay-kA-FRG"/>
-                            <constraint firstItem="TUE-lf-3ok" firstAttribute="bottom" secondItem="579-Vr-vOb" secondAttribute="top" id="ugX-u5-iZP"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="collectionView" destination="7k5-iy-PRK" id="0zM-8d-Dom"/>
                         <outlet property="mapView" destination="gLv-3X-kWl" id="WE0-Xm-yFB"/>
-                        <outlet property="modificationButton" destination="TUE-lf-3ok" id="CZw-u4-M8e"/>
+                        <outlet property="modificationButton" destination="CyU-HJ-Oku" id="Bn8-6e-lCa"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Lty-Nv-O9u" userLabel="First Responder" sceneMemberID="firstResponder"/>

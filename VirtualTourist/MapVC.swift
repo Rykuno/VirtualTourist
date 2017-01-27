@@ -12,11 +12,12 @@ import CoreData
 
 class MapVC: UIViewController {
     
-    //MARK: - Variables
+    //MARK: - Outlets
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var slideView: UIView!
     @IBOutlet weak var editBarItem: UIBarButtonItem!
     
+    //MARK: - Variables
     var currentEditing: Bool = false
     
     //MARK: - Lifecycle
@@ -45,11 +46,11 @@ class MapVC: UIViewController {
     
     //MARK: - Actions
     @IBAction func editAction(_ sender: Any) {
-        if currentEditing == false && CoreDataHelper.sharedInstance().getPinArrayCount == 0 {
+        if currentEditing == false && CoreDataClient.sharedInstance().getPinArrayCount == 0 {
             displayError(title: "No Pins to Delete", message: "Place a pin on the map first")
         }else{
             slideView.isHidden = false
-            currentEditing = !currentEditing
+            currentEditing = !currentEditing 
             showSlideView(showing: currentEditing)
         }
     }
@@ -68,7 +69,7 @@ class MapVC: UIViewController {
             })
         }
         
-        if (showing == true && CoreDataHelper.sharedInstance().getPinArrayCount > 0) {
+        if (showing == true && CoreDataClient.sharedInstance().getPinArrayCount > 0) {
             self.editBarItem.title = "Done"
             self.editBarItem.isEnabled = false
             UIView.animate(withDuration: 0.5, animations: { 
@@ -86,7 +87,7 @@ class MapVC: UIViewController {
         let longPressRecogniser = UILongPressGestureRecognizer(target: self, action: #selector(createPinOnMap(getstureRecognizer:)))
         longPressRecogniser.minimumPressDuration = 1.0
         mapView.addGestureRecognizer(longPressRecogniser)
-    }
+    } 
     
     func createPinOnMap(getstureRecognizer : UIGestureRecognizer){
         if getstureRecognizer.state != .began { return }
@@ -100,10 +101,10 @@ class MapVC: UIViewController {
         let longitude = annotation.coordinate.longitude
         
         //add the pin to core data
-        CoreDataHelper.sharedInstance().createPin(latitude: latitude, longitude: longitude) { (error) in
+        CoreDataClient.sharedInstance().savePin(latitude: latitude, longitude: longitude) { (error) in
             guard error == nil else {
-                displayError(title: "Data Error", message: error!)
-                return
+                displayError(title: Constants.Error.Title.generic, message: error!)
+                return 
             }
             mapView.addAnnotation(annotation)
         }
@@ -111,9 +112,9 @@ class MapVC: UIViewController {
     
     func addUserAnnotations(){
         self.mapView.removeAnnotations(self.mapView.annotations)
-        CoreDataHelper.sharedInstance().fetchPins { (annotationArray, error) in
+        CoreDataClient.sharedInstance().fetchPins { (annotationArray, error) in
             guard error == nil else{
-                displayError(title: "Oh No!", message: "There was an error fetching Pins")
+                displayError(title: Constants.Error.Title.generic, message: Constants.Error.Message.fetchError)
                 return
             }
             
@@ -126,8 +127,6 @@ class MapVC: UIViewController {
         }
     }
     
-    
-
     
     //MARK: - UserDefaults
     func getMapSettings(){
@@ -166,6 +165,7 @@ class MapVC: UIViewController {
     }
 }
 
+//MARK: - Map Delegate
 extension MapVC: MKMapViewDelegate {
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
@@ -174,7 +174,7 @@ extension MapVC: MKMapViewDelegate {
             let latitude = annotation?.coordinate.latitude
             let longitude = annotation?.coordinate.longitude
             
-            CoreDataHelper.sharedInstance().deletePin(latitude: latitude!, longitude: longitude!, completionHandler: { (error) in
+            CoreDataClient.sharedInstance().deletePin(latitude: latitude!, longitude: longitude!, completionHandler: { (error) in
                 guard error == nil else{
                     displayError(title: "Deletion Error", message: error!)
                     return
@@ -182,10 +182,15 @@ extension MapVC: MKMapViewDelegate {
                 mapView.removeAnnotation(annotation!)
             })
         }else{
-            let controller = storyboard?.instantiateViewController(withIdentifier: "PinDetailVC") as! PinDetailVC
+            let controller = storyboard?.instantiateViewController(withIdentifier: "PhotoAlbumVC") as! PhotoAlbumVC
             controller.annotation = view.annotation
-            controller.latitude = view.annotation?.coordinate.latitude
-            controller.longitude = view.annotation?.coordinate.longitude
+            CoreDataClient.sharedInstance().fetchPhotos(annotation: view.annotation!, completionHandler: { (photos, error) in
+                guard let photos = photos else{
+                    controller.photos = [Photo]()
+                    return
+                }
+                controller.photos = photos
+            })
             self.navigationController?.pushViewController(controller, animated: true)
         }
     }

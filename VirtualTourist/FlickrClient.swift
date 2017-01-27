@@ -11,9 +11,9 @@ import UIKit
 
 class FlickrClient: NSObject {
     let session = URLSession.shared
-    
     private override init(){}
  
+    //MARK: - Singleton
     class func sharedInstance() -> FlickrClient {
         struct Singleton{
             static var sharedInstance = FlickrClient()
@@ -21,46 +21,45 @@ class FlickrClient: NSObject {
         return Singleton.sharedInstance
     }
 
-    
-    func sendRequest(latitude: Double, longitude: Double, completionHandler: @escaping (_ urlArray: [String], _ error: String?) -> Void) {
+    //MARK: - Download JSON
+    func sendRequest(latitude: Double, longitude: Double, page: Int, completionHandler: @escaping (_ urlArray: [String]?, _ error: String?) -> Void) {
         let sessionConfig = URLSessionConfiguration.default
-        
         /* Create session, and optionally set a URLSessionDelegate. */
         let session = URLSession(configuration: sessionConfig, delegate: nil, delegateQueue: nil)
         
         // Create the Request:
-        guard var URL = URL(string: "https://api.flickr.com/services/rest/") else {return}
+        guard var URL = URL(string: Constants.Flickr.baseUrl) else {return}
         let URLParams = [
-            "method": "flickr.photos.search",
-            "api_key": "040e5c9f08eb49f7ff3ffc7b417af8e9",
-            "safe_search": "1",
-            "extras": "url_s",
-            "per_page": "20",
-            "format": "json",
-            "nojsoncallback": "1",
-            "lat": "\(latitude)",
-            "lon": "\(longitude)",
-            "radius": "5",
-            "radius_units": "mi",
+            Constants.Flickr.Param.method: Constants.Flickr.Key.method,
+            Constants.Flickr.Param.apiKey: Constants.Flickr.Key.apiKey,
+            Constants.Flickr.Param.safeSearch: Constants.Flickr.Key.safeSearch,
+            Constants.Flickr.Param.extras: Constants.Flickr.Key.extras,
+            Constants.Flickr.Param.perPage: Constants.Flickr.Key.perPage,
+            Constants.Flickr.Param.format: Constants.Flickr.Key.format,
+            Constants.Flickr.Param.noJsonCallback: Constants.Flickr.Key.noJsonCallback,
+            Constants.Flickr.Param.latitude: "\(latitude)",
+            Constants.Flickr.Param.longitude: "\(longitude)",
+            Constants.Flickr.Param.radius: Constants.Flickr.Key.radius,
+            Constants.Flickr.Param.page: "\(page)",
+            Constants.Flickr.Param.radiusUnits: Constants.Flickr.Key.radiusUnits,
             ]
+        
         URL = URL.appendingQueryParameters(URLParams)
         var request = URLRequest(url: URL)
-        request.httpMethod = "GET"
+        request.httpMethod = Constants.Flickr.httpMethod
         
         // Headers
-        
-        request.addValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+        request.addValue(Constants.Flickr.HTTPHeaderValue, forHTTPHeaderField: Constants.Flickr.HTTPHeaderField)
         
         // JSON Body
-        
         let bodyObject: [String : Any] = [:]
         request.httpBody = try! JSONSerialization.data(withJSONObject: bodyObject, options: [])
         
-        /* Start a new Task */
+        // Start a new Task
         let task = session.dataTask(with: request, completionHandler: { (data: Data?, response: URLResponse?, error: Error?) -> Void in
             
             guard error == nil else{
-                completionHandler([], "Check connection and try again")
+                completionHandler(nil, Constants.Error.Message.checkConnection)
                 return
             }
             
@@ -69,54 +68,69 @@ class FlickrClient: NSObject {
             }
             
             guard statusCode >= 200 && statusCode <= 299 else{
-                completionHandler([], "Error, Try again later")
+                completionHandler(nil, Constants.Error.Message.tryAgain)
                 return
             }
             
             guard let data = data else{
-                completionHandler([], "Data Error")
+                completionHandler(nil, Constants.Error.Message.dataError)
                 return
             }
   
             convertData(data: data, completionHandlerForData: { (result, error) in
                 guard error == nil else{
-                    completionHandler([], "Data Error")
+                    completionHandler(nil, Constants.Error.Message.dataError)
                     return
                 }
                 
                 guard let result = result else{
-                    completionHandler([], "Error parsing data")
+                    completionHandler(nil, Constants.Error.Message.dataError)
                     return
                 }
                 
-                guard let photos = result["photos"] as? [String:AnyObject] else {
-                    completionHandler([], "Error Parsing Data")
+                guard let photos = result[Constants.Flickr.Results.photos] as? [String:AnyObject] else {
+                    completionHandler(nil, Constants.Error.Message.dataError)
+                    return
+                }
+                
+                guard let pages = photos[Constants.Flickr.Results.pages] as? Int else {
+                    completionHandler(nil, Constants.Error.Message.dataError)
                     return
                 }
 
-                guard let photoArr = photos["photo"] as? [[String:AnyObject]] else{
-                    completionHandler([], "Error Parsing Data")
+                guard let photoArr = photos[Constants.Flickr.Results.photo] as? [[String:AnyObject]] else{
+                    completionHandler(nil, Constants.Error.Message.dataError)
                     return
                 }
                 
-                var arrayOfPhotos = [String]()
+                var arrayOfUrls = [String]()
+                
+                CoreDataClient.sharedInstance().savePagesForPin(latitude: latitude, longitude: longitude, pages: pages)
                 
                 for picture in photoArr{
-                    let url = parseImages(dictionary: picture)
-                    arrayOfPhotos.append(url)
-                    }
+                        let url = parseImages(dictionary: picture)
+                        arrayOfUrls.append(url)
+                }
                 
-                completionHandler(arrayOfPhotos, nil)
+                    completionHandler(arrayOfUrls, nil)
+                
             })
         })
         task.resume()
         session.finishTasksAndInvalidate()
     }
+    //MARK: - Download Images
+    func downloadImage(url: URL, completionHandler: @escaping (_ downloadedData: Data?) -> Void){
+        DispatchQueue.global().async {
+            let data = try? Data(contentsOf: url)
+            completionHandler(data!)
+        }
+    }
 }
- 
+ //MARK: - Helper Functions
 private func parseImages(dictionary: [String:AnyObject]) -> String{
     
-    guard let url = dictionary["url_s"] else{
+    guard let url = dictionary[Constants.Flickr.Key.extras] else{
         return ""
     }
     return url as! String
