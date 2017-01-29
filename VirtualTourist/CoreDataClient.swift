@@ -66,14 +66,14 @@ class CoreDataClient {
             
         }
         return nil
-    }
+    } 
     
     func fetchNumberOfPages(annotation: MKAnnotation, completionHandler: (_ pages: Int16) -> Void){
         let pin = findPin(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude)
         if let pin = pin{
             let numberOfPages = pin.pages
             completionHandler(numberOfPages)
-        }else{
+        }else{ 
             completionHandler(1)
         }
     }
@@ -117,11 +117,14 @@ class CoreDataClient {
     }
     
     func savePagesForPin(latitude: Double, longitude: Double, pages: Int) {
-        let pin = findPin(latitude: latitude, longitude: longitude)
+        let moc = persistentContainer.viewContext
+        moc.performAndWait {
+        let pin = self.findPin(latitude: latitude, longitude: longitude)
         pin?.pages = Int16(pages)
         
         do{
-            saveContext()
+            self.saveContext()
+        }
         }
     }
     
@@ -200,7 +203,6 @@ class CoreDataClient {
             saveContext()
         }
     }
-    
     
     func fetchPhotos(annotation: MKAnnotation, completionHandler: (_ arrayOfPhotos:[Photo]?, _ error: String?) -> Void ){
         let pin = findPin(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude)

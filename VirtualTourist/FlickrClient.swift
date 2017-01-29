@@ -11,6 +11,7 @@ import UIKit
 
 class FlickrClient: NSObject {
     let session = URLSession.shared
+    let moc = CoreDataClient.sharedInstance().persistentContainer.viewContext
     private override init(){}
  
     //MARK: - Singleton
@@ -105,7 +106,11 @@ class FlickrClient: NSObject {
                 
                 var arrayOfUrls = [String]()
                 
+                self.moc.performAndWait({ 
                 CoreDataClient.sharedInstance().savePagesForPin(latitude: latitude, longitude: longitude, pages: pages)
+                })
+
+                
                 
                 for picture in photoArr{
                         let url = parseImages(dictionary: picture)

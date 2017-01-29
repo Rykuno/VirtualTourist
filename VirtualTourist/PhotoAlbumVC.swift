@@ -21,6 +21,8 @@ class PhotoAlbumVC: UIViewController, MKMapViewDelegate {
     var annotation: MKAnnotation!
     var photos = [Photo]()
     var selectedItems = [IndexPath]()
+    let moc = CoreDataClient.sharedInstance().persistentContainer.viewContext
+    
     
     //MARK: - Lifecycle
     override func viewDidLoad() {
@@ -68,11 +70,10 @@ class PhotoAlbumVC: UIViewController, MKMapViewDelegate {
             }else{
                 CoreDataClient.sharedInstance().fetchNumberOfPages(annotation: annotation) { (pages) in
                     
-                    /*For some reason the Flickr API returns all the same results after a certain page
-                     so I just randomed the page to 10 for safety.
-                     */
-                    if pages>10{
-                        pageToSearch = Int(arc4random_uniform(UInt32(10)))
+                    if pages < 200{
+                        pageToSearch = Int(arc4random_uniform(UInt32(pages)))
+                    }else{
+                        pageToSearch = Int(arc4random_uniform(UInt32(200)))
                     }
                 }
             }
@@ -87,27 +88,30 @@ class PhotoAlbumVC: UIViewController, MKMapViewDelegate {
                     self.displayError(title: Constants.Error.Title.generic, message: "No images to display")
                     return
                 }
-                
-                CoreDataClient.sharedInstance().saveImageUrls(urlArray: urlArray, latitude: latitude, longitude: longitude, completionHandler: { (success, error) in
-                    guard success == true else{
-                        self.displayError(title: Constants.Error.Title.generic, message: error!)
-                        return
-                    }
-                    CoreDataClient.sharedInstance().fetchPhotos(annotation: self.annotation, completionHandler: { (photos, error) in
-                        guard error == nil else {
-                            self.displayError(title: Constants.Error.Title.fetchError, message: error!)
+                self.moc.performAndWait({
+                    CoreDataClient.sharedInstance().saveImageUrls(urlArray: urlArray, latitude: latitude, longitude: longitude, completionHandler: { (success, error) in
+                        
+                        guard success == true else{
+                            self.displayError(title: Constants.Error.Title.generic, message: error!)
                             return
                         }
-                        guard let photos = photos else{
-                            self.displayError(title: Constants.Error.Title.fetchError, message: error!)
-                            return
-                        }
-                        DispatchQueue.main.async {
-                            self.photos = photos
-                            self.collectionView.reloadData()
-                            self.modificationButton.isEnabled = true
-                        }
+                        CoreDataClient.sharedInstance().fetchPhotos(annotation: self.annotation, completionHandler: { (photos, error) in
+                            guard error == nil else {
+                                self.displayError(title: Constants.Error.Title.fetchError, message: error!)
+                                return
+                            }
+                            guard let photos = photos else{
+                                self.displayError(title: Constants.Error.Title.fetchError, message: error!)
+                                return
+                            }
+                            DispatchQueue.main.async {
+                                self.photos = photos
+                                self.collectionView.reloadData()
+                                self.modificationButton.isEnabled = true
+                            }
+                        })
                     })
+                    
                 })
             }
         }else{
@@ -138,6 +142,8 @@ class PhotoAlbumVC: UIViewController, MKMapViewDelegate {
             CoreDataClient.sharedInstance().deletePhoto(photo: photo)
         }
         
+        //saves context after deletion
+        CoreDataClient.sharedInstance().saveContext()
         selectedItems = [IndexPath]()
         updateButton()
     }
@@ -185,6 +191,7 @@ extension PhotoAlbumVC: UICollectionViewDelegate, UICollectionViewDataSource {
                             photo.image = data as NSData?
                             cell.activityIndicator.stopAnimating()
                             cell.image.image = UIImage(data: data)
+                            CoreDataClient.sharedInstance().saveContext()  
                         }else{
                             cell.image.image = UIImage(named: "EmptyImage")
                             cell.activityIndicator.stopAnimating()
